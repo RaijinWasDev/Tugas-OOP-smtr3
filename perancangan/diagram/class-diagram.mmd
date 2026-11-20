@@ -1,0 +1,88 @@
+classDiagram
+direction TB
+class User {
+  <<abstract>>
+  -String username
+  -String passwordHash
+  #String nama
+  -String email
+  +login()
+  +logout()
+  +tampilkanDashboard()*
+}
+class CalonMahasiswa {
+  -String nomorPendaftaran
+  -String statusSeleksi
+  +daftar()
+}
+class Mahasiswa {
+  -String nim
+  -int semester
+  +ajukanKRS()
+}
+class Dosen {
+  -String nidn
+  +tinjauKRS()
+  +inputNilai()
+}
+class Admin {
+  -String kodePetugas
+  +verifikasiPendaftaran()
+}
+class Course {
+  -String kode
+  -String nama
+  -int sks
+  +lihatPrasyarat()
+}
+class Enrollment {
+  -String periode
+  +lihatStatusKRS()
+}
+class Schedule {
+  -String hari
+  -Time mulai
+  -Time selesai
+  -String ruang
+  +bentrokDengan(jadwal) bool
+}
+class Grade {
+  -float angka
+  -String huruf
+  +konversiHuruf()
+}
+class Payment {
+  -String semester
+  -decimal jumlah
+  -Date tanggalBayar
+  -String status
+  +catatPembayaran()
+}
+class KRS {
+  -String periode
+  -String status
+  +totalSKS() int
+  +ajukan()
+}
+class ProgramStudi {
+  -String kode
+  -String nama
+  +lihatDosen()
+}
+User <|-- CalonMahasiswa
+User <|-- Mahasiswa
+User <|-- Dosen
+User <|-- Admin
+CalonMahasiswa "1" -- "0..1" Mahasiswa : diterima menjadi
+ProgramStudi "1" -- "0..*" Mahasiswa : menaungi
+ProgramStudi "0..1" o-- "0..*" Dosen : menghimpun
+Mahasiswa "1" -- "0..*" KRS : menyusun
+KRS "1" *-- "0..*" Enrollment : memuat
+Course "1" -- "0..*" Enrollment : diambil melalui
+Enrollment "1" *-- "0..1" Grade : memperoleh
+Course "1" *-- "0..*" Schedule : dijadwalkan
+Schedule "1" -- "0..*" Enrollment : kelas pilihan
+Dosen "1" -- "0..*" Schedule : mengajar
+Dosen "0..1" -- "0..*" KRS : meninjau
+Course "0..*" --> "0..*" Course : prasyarat
+Mahasiswa "1" -- "0..*" Payment : memiliki tagihan
