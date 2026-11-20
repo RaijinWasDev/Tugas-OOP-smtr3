@@ -3,6 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 
+from tugas.minggu_08_perubahan_jadwal.alternatif import Calendar, alternatives
+from tugas.minggu_08_perubahan_jadwal.observer import schedule_changed
 from database import get_db
 from routers.akses import require_admin
 
@@ -25,20 +27,14 @@ def daftar(db=Depends(get_db)):
         ORDER BY m.hari, m.mulai, j.kode""")).mappings().all()
 
 
-def detect_schedule_conflict(db, data):
-    rows = db.execute(text("""SELECT j.kode, j.ruangan, j.dosen FROM matakuliah m
-        JOIN jadwal j USING(kode) WHERE m.kode != :kode AND m.hari=:hari
-        AND m.mulai < :selesai AND :mulai < m.selesai ORDER BY j.kode"""), data)
-    conflicts = []
-    for row in rows:
-        types = []
-        if row.ruangan == data["ruangan"]:
-            types.append("room_conflict")
-        if row.dosen.casefold() == data["dosen"].casefold():
-            types.append("lecturer_conflict")
-        if types:
-            conflicts.append({"types": ["time_overlap", *types], "jadwal": [data["kode"], row.kode]})
-    return conflicts
+def previous_slot(db, kode):
+    return db.execute(text("""SELECT j.kode,j.ruangan,j.dosen,m.hari,m.mulai,m.selesai
+        FROM jadwal j JOIN matakuliah m USING(kode) WHERE j.kode=:kode"""), {"kode": kode}).mappings().first()
+
+
+@router.get("/jadwal/notifikasi", dependencies=ADMIN)
+def notifications(db=Depends(get_db)):
+    return db.execute(text("SELECT * FROM pesan_jadwal ORDER BY id DESC LIMIT 50")).mappings().all()
 
 
 @router.put("/jadwal/{kode}", dependencies=ADMIN)
@@ -55,22 +51,32 @@ def simpan(kode: str, slot: Slot, db=Depends(get_db)):
         raise HTTPException(404, "Ruangan tidak ditemukan")
     enrolled = db.scalar(text("""SELECT count(DISTINCT k.nim) FROM krs_detail d JOIN krs k
         ON k.id=d.krs_id WHERE d.kode_mk=:kode"""), data)
-    if enrolled > kapasitas:
-        raise HTTPException(409, f"{enrolled} mahasiswa melebihi kapasitas {kapasitas}")
-    conflicts = detect_schedule_conflict(db, data)
-    if conflicts:
-        raise HTTPException(409, conflicts)
+    calendar = Calendar(db, kode)
+    conflicts = calendar.conflicts(data)
+    if enrolled > kapasitas or conflicts:
+        msg = (f"{enrolled} mahasiswa melebihi kapasitas {kapasitas}" if enrolled > kapasitas else
+               "Jadwal bentrok dengan " + ", ".join(c["jadwal"][1] for c in conflicts))
+        raise HTTPException(409, {"pesan": msg, "konflik": conflicts,
+                                  "alternatif": alternatives(db, calendar, data, enrolled)})
+    old = previous_slot(db, kode)
+    if old == data:
+        return data
     db.execute(text("UPDATE matakuliah SET hari=:hari, mulai=:mulai, selesai=:selesai WHERE kode=:kode"), data)
     db.execute(text("""INSERT INTO jadwal VALUES (:kode,:ruangan,:dosen)
         ON CONFLICT(kode) DO UPDATE SET ruangan=excluded.ruangan, dosen=excluded.dosen"""), data)
+    message = f"{kode}: hari {slot.hari}, {slot.mulai//60:02}:{slot.mulai%60:02} di {slot.ruangan}, dosen {data['dosen']}."
+    schedule_changed(db, kode, message, [old["dosen"], data["dosen"]] if old else [data["dosen"]])
     db.commit()
     return data
 
 
 @router.delete("/jadwal/{kode}", dependencies=ADMIN)
 def hapus(kode: str, db=Depends(get_db)):
+    db.execute(text("BEGIN IMMEDIATE"))
+    old = previous_slot(db, kode)
     result = db.execute(text("DELETE FROM jadwal WHERE kode=:kode"), {"kode": kode})
     if not result.rowcount:
         raise HTTPException(404, "Jadwal tidak ditemukan")
+    schedule_changed(db, kode, f"Jadwal {kode} dihapus.", [old["dosen"]])
     db.commit()
     return {"dihapus": kode}

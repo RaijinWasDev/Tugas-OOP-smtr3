@@ -28,3 +28,5 @@ Tekan Ctrl+C di terminal untuk menghentikan server. Jika port 8007 sedang dipaka
 - [Minggu 7 — jadwal ruangan](tugas/minggu_07_jadwal_ruangan/)
 
 [Pengumpulan UTS](UTS/README.md) · [Contoh pendaftar](contoh/pendaftar.json)
+
+[Minggu 8 - Perubahan jadwal dan notifikasi](tugas/minggu_08_perubahan_jadwal/)
