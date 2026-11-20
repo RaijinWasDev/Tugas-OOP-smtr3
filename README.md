@@ -4,5 +4,6 @@
 
 - [Minggu 1 — Rancangan awal](progres/minggu-01.md)
 - [Minggu 2 — Diagram UML](progres/minggu-02.md)
+- [Minggu 3 — Pendaftaran PMB](progres/minggu-03.md)
 
 [Laporan final UML](perancangan/docs/Final-UML.pdf)
