@@ -62,11 +62,17 @@ async function loadKrs(){
   if(request!==generation)return;
   current=record;
   el('summary').textContent=record?[statusText[record.status],record.total_sks+' SKS',record.catatan].filter(Boolean).join(' Â· '):'Belum ada mata kuliah yang dipilih.';
-  const editable=!record || ['draft','revision'].includes(record.status);
-  for(const code of record?.mata_kuliah || [])item(el('courses'),courseName(code),'Hapus',editable?async()=>{await api(krsPath()+'/mata-kuliah/'+code,'DELETE');await loadKrs();}:null);
-  el('add').hidden=!editable;el('submitKrs').hidden=!editable || !record?.mata_kuliah.length;
+  const editable=!record || ['draft','revision','approved'].includes(record.status);
+  for(const code of record?.mata_kuliah || [])item(el('courses'),courseName(code),'Hapus',editable?async()=>{await editCourse(code,'DELETE');}:null);
+  el('add').hidden=!editable;el('submitKrs').hidden=!editable || record?.status==='approved' || !record?.mata_kuliah.length;
   el('reopen').hidden=record?.status!=='approved';
   el('review').hidden=record?.status!=='submitted';
+}
+async function editCourse(code, method){
+  const path=current?.status==='approved'
+    ? '/koreksi/'+code+'?version='+current.version
+    : '/mata-kuliah/'+code;
+  try {await api(krsPath()+path,method);} finally {await loadKrs();}
 }
 async function transition(action){
   const body={version:current.version};
@@ -102,7 +108,7 @@ el('register').onsubmit=run(async()=>{
   await api('/api/pmb/register','POST',body);el('register').reset();await loadPeople();el('notice').textContent='Pendaftar berhasil ditambahkan.';
 });
 for(const id of ['student','semester'])el(id).onchange=run(loadKrs);
-el('add').onsubmit=run(async()=>{await api(krsPath()+'/mata-kuliah/'+fields('add').course.value,'POST');await loadKrs();});
+el('add').onsubmit=run(async()=>{await editCourse(fields('add').course.value,'POST');});
 el('submitKrs').onclick=run(()=>transition('submit'));
 el('approve').onclick=run(()=>transition('approve'));
 el('reopen').onsubmit=run(async()=>{await transition('reopen');el('reopen').reset();});
