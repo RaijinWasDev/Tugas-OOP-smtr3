@@ -9,7 +9,7 @@ async function api(path, method='GET', body, headers={}) {
   const result = await response.json();
   if (!response.ok) {
     const details = result.detail;
-    if(details?.alternatif) showAlternatives(details.alternatif);
+    if(details?.alternatif){showConflicts(details.konflik);showAlternatives(details.alternatif);}
     const message = Array.isArray(details) ? details.map(d => d.types ? 'Bentrok dengan '+d.jadwal[1]+' ('+d.types.filter(t=>t!=='time_overlap').map(t=>t==='room_conflict'?'ruangan':'dosen').join(' dan ')+')' : d.pesan).join('. ') : details?.pesan || details;
     throw Object.assign(new Error(message || 'Permintaan gagal.'), {status:response.status});
   }
@@ -83,10 +83,18 @@ async function transition(action){
 }
 const clock=n=>[Math.floor(n/60),n%60].map(i=>String(i).padStart(2,'0')).join(':');
 const minutes=t=>Number(t.slice(0,2))*60+Number(t.slice(3));
+function showConflicts(rows){
+  const list=el('conflicts');list.replaceChildren();
+  for(const r of rows){
+    const types=r.types.filter(t=>t!=='time_overlap').map(t=>t==='room_conflict'?'ruangan sama':'dosen sama');
+    item(list,r.jadwal.map(courseName).join(' / ')+' - '+types.join(', '));
+  }
+  if(!rows.length)item(list,'Tidak ada bentrok waktu, ruang, atau dosen.');
+}
 function showAlternatives(rows){
   const list=el('alternatives');
   list.replaceChildren();
-  for(const r of rows)item(list,[days[r.hari-1],clock(r.mulai),r.ruangan,r.reason].join(' / '),'Pilih',()=>{
+  for(const r of rows)item(list,[days[r.hari-1],clock(r.mulai),r.ruangan,r.sumber,r.reason].join(' / '),'Pilih',()=>{
     const f=fields('schedule');
     f.kode.value=r.kode; f.hari.value=r.hari; f.mulai.value=clock(r.mulai);
     f.selesai.value=clock(r.selesai); f.ruangan.value=r.ruangan; f.dosen.value=r.dosen;
@@ -95,6 +103,7 @@ function showAlternatives(rows){
   if(!rows.length)item(list,'Belum ada alternatif yang memenuhi batasan.');
 }
 async function loadSlots(){
+  showConflicts(await api('/jadwal/konflik'));
   const log=el('scheduleLog');log.replaceChildren();
   for(const r of await api('/jadwal/notifikasi'))item(log,[r.media,r.penerima,r.pesan].join(' / '));
   if(!log.children.length)item(log,'Belum ada notifikasi.');
@@ -134,4 +143,17 @@ el('schedule').onsubmit=run(async()=>{
   el('alternatives').replaceChildren();
   await api('/jadwal/'+f.kode.value,'PUT',{hari:Number(f.hari.value),mulai:minutes(f.mulai.value),selesai:minutes(f.selesai.value),ruangan:f.ruangan.value,dosen:f.dosen.value});
   await loadSlots();el('notice').textContent='Jadwal tersimpan.';
+});
+
+el('retryMessages').onclick=run(async()=>{
+  const result=await api('/jadwal/outbox/retry','POST');
+  await loadSlots();el('notice').textContent='Notifikasi tertunda: '+result.pending;
+});
+el('calendarExport').onsubmit=run(async()=>{
+  const query=new URLSearchParams(new FormData(el('calendarExport')));
+  const response=await fetch('/jadwal/kalender.ics?'+query,{headers:{'X-Admin-Key':key}});
+  if(!response.ok)throw new Error('Ekspor gagal. Periksa rentang tanggal semester.');
+  const link=document.createElement('a');
+  link.href=URL.createObjectURL(await response.blob());link.download='jadwal.ics';
+  link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);
 });

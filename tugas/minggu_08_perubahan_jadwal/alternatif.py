@@ -1,4 +1,5 @@
 from collections import defaultdict
+from .ai import select_suggestions
 from sqlalchemy import text
 
 
@@ -64,4 +65,5 @@ def alternatives(db, calendar, slot, enrolled):
                     continue
                 rank = (abs(day-slot["hari"]), abs(start-slot["mulai"]), room!=slot["ruangan"], start, room)
                 choices.append((rank, dict(candidate, reason="Kapasitas cukup, ruangan dan dosen tersedia.")))
-    return [choice for _, choice in sorted(choices,key=lambda pair: pair[0])[:3]]
+    ranked = [choice for _, choice in sorted(choices,key=lambda pair: pair[0])[:24]]
+    return select_suggestions(slot, ranked)

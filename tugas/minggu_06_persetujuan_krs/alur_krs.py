@@ -18,6 +18,8 @@ ALLOWED={
 def check_transition(source,target,role):
     if (source,target) not in ALLOWED:
         raise KRSError(f"Transisi {source} ke {target} tidak diizinkan",409)
+    if role=="sistem" and target==KRSStatus.REVISION and source in (KRSStatus.SUBMITTED,KRSStatus.APPROVED):
+        return
     if ALLOWED[source,target]!=role:
         raise KRSError("Peran tidak berwenang",403)
 
@@ -43,15 +45,19 @@ class KRSWorkflow(KRSManager):
                     raise KRSError("; ".join(report["kesalahan"]) or "KRS kosong")
             if target==KRSStatus.REVISION and not (note or "").strip():
                 raise KRSError("Catatan revisi wajib diisi")
-            self.query("""UPDATE krs SET status=:target,version=version+1,catatan=:note,
-                submitted_at=CASE WHEN :target='submitted' THEN CURRENT_TIMESTAMP ELSE submitted_at END,
-                approved_at=CASE WHEN :target='approved' THEN CURRENT_TIMESTAMP WHEN :target='revision' THEN NULL ELSE approved_at END
-                WHERE id=:id""",target=target,note=note,id=k.id)
-            self.query("""INSERT INTO krs_log(krs_id,asal,tujuan,aktor,catatan)
-                VALUES(:id,:old,:new,:actor,:note)""",id=k.id,old=k.status,new=target,actor=actor,note=note)
+            self.apply_transition(k,target,role,actor,note)
             self.query("INSERT INTO notifikasi(krs_id,penerima,pesan) VALUES(:id,:to,:msg)",
                        id=k.id,to=k.dosen_pa_id if role=="mahasiswa" else nim,msg=f"KRS {target}. {note or ''}".strip())
             return self.summary(k.id,target)
+
+    def apply_transition(self,k,target,role,actor,note):
+        check_transition(k.status,target,role)
+        self.query("""UPDATE krs SET status=:target,version=version+1,catatan=:note,
+            submitted_at=CASE WHEN :target='submitted' THEN CURRENT_TIMESTAMP ELSE submitted_at END,
+            approved_at=CASE WHEN :target='approved' THEN CURRENT_TIMESTAMP WHEN :target='revision' THEN NULL ELSE approved_at END
+            WHERE id=:id""",target=target,note=note,id=k.id)
+        self.query("""INSERT INTO krs_log(krs_id,asal,tujuan,aktor,catatan)
+            VALUES(:id,:old,:new,:actor,:note)""",id=k.id,old=k.status,new=target,actor=actor,note=note)
 
     def submit_krs(self,nim,semester,actor,version):
         return self.transition(nim,semester,KRSStatus.SUBMITTED,"mahasiswa",actor,version)
