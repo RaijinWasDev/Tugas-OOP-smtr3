@@ -1,0 +1,34 @@
+sequenceDiagram
+actor C as CalonMahasiswa
+participant P as PMBService
+participant R as Repository
+actor A as Admin
+participant F as UserFactory
+participant B as EventBus
+participant N as NotificationService
+C->>P: Daftar dengan email dan berkas
+P->>R: Simpan pendaftar dengan email unik
+alt Email sudah dipakai
+ P-->>C: Email sudah terdaftar
+else Berhasil
+ P-->>C: Nomor pendaftaran dan status pending
+end
+Note over A,P: Setelah seleksi, untuk pendaftar yang tersimpan
+A->>P: Verifikasi dan setujui pendaftar
+P->>R: Periksa status dan kelengkapan
+alt Sudah disetujui
+ P-->>A: Kembalikan NIM sebelumnya
+else Berkas kurang
+ P-->>A: Sebut berkas yang perlu dilengkapi
+else Lulus dan berkas lengkap
+ P->>F: Buat mahasiswa dengan NIM unik
+ F-->>P: Mahasiswa baru
+ P->>R: Simpan mahasiswa dan persetujuan dalam satu transaksi
+ P-)B: Terbitkan MahasiswaDiterima setelah commit
+ P-->>A: Persetujuan berhasil
+ B-)N: Beri tahu subscriber
+ N-)C: Kirim NIM dan informasi akun
+ opt Email gagal dikirim
+ N->>N: Jadwalkan percobaan ulang untuk event yang sama
+ end
+end

@@ -86,3 +86,43 @@ Dosen "1" -- "0..*" Schedule : mengajar
 Dosen "0..1" -- "0..*" KRS : meninjau
 Course "0..*" --> "0..*" Course : prasyarat
 Mahasiswa "1" -- "0..*" Payment : memiliki tagihan
+class PMBService {
+ +daftar()
+ +setujui()
+}
+class UserFactory {
+ +buatMahasiswa()
+}
+class KRSManager {
+ +ajukanKRS()
+}
+class KRSValidator {
+ +validasiSemua()
+}
+class Repository {
+ <<interface>>
+ +bacaRiwayat()
+ +simpan()
+}
+class EventBus {
+ +subscribe()
+ +publish()
+}
+class Subscriber {
+ <<interface>>
+ +terimaEvent()
+}
+class NotificationService {
+ +terimaEvent()
+ +cobaLagi()
+}
+PMBService ..> Repository
+PMBService ..> UserFactory
+UserFactory ..> Mahasiswa
+KRSManager ..> KRSValidator
+KRSManager ..> Repository
+KRSValidator ..> Repository
+PMBService ..> EventBus
+KRSManager ..> EventBus
+EventBus "1" --> "0..*" Subscriber : memberi tahu
+Subscriber <|.. NotificationService

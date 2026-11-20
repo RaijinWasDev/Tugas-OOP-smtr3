@@ -1,0 +1,53 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 1 /Kids [4 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 1080 790] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 2064 >>
+stream
+0.10 0.20 0.28 RG 0.08 0.14 0.19 rg
+BT /F1 24 Tf 34 755 Td (ADR 01-02 | Keputusan desain Sevima Mini) Tj ET
+34 738 m 1050 738 l S
+BT /F1 18 Tf 42 690 Td (01  Penerbitan NIM melalui UserFactory) Tj ET
+BT /F1 14 Tf 42 650 Td (Konteks: Persetujuan PMB dapat dikirim ulang. Satu pendaftar yang disetujui harus tetap memiliki satu identitas) Tj ET
+BT /F1 14 Tf 42 631 Td (mahasiswa.) Tj ET
+BT /F1 14 Tf 42 600 Td (Keputusan: PMBService memeriksa status, lalu memanggil UserFactory untuk membuat mahasiswa beserta NIM.) Tj ET
+BT /F1 14 Tf 42 581 Td (Penyimpanan persetujuan, nomor urut dan mahasiswa harus mengikuti transaksi yang sama. Persetujuan ulang) Tj ET
+BT /F1 14 Tf 42 562 Td (mengembalikan NIM tersimpan.) Tj ET
+BT /F1 14 Tf 42 531 Td (Alternatif: Membuat NIM di endpoint lebih singkat, tetapi jalur impor dan persetujuan dapat menerapkan aturan) Tj ET
+BT /F1 14 Tf 42 512 Td (berbeda.) Tj ET
+BT /F1 14 Tf 42 481 Td (Konsekuensi: Format NIM cukup diuji di satu tempat. Implementasi tetap membutuhkan indeks unik serta transaksi) Tj ET
+BT /F1 14 Tf 42 462 Td (yang melindungi dua persetujuan bersamaan. Pattern: Factory.) Tj ET
+BT /F1 18 Tf 42 416 Td (02  Validasi KRS dan pemberitahuan dosen PA) Tj ET
+BT /F1 14 Tf 42 376 Td (Konteks: Satu KRS dapat melanggar beberapa aturan sekaligus. Pesan ke dosen baru diperlukan setelah pengajuan) Tj ET
+BT /F1 14 Tf 42 357 Td (tersimpan.) Tj ET
+BT /F1 14 Tf 42 326 Td (Keputusan: KRSValidator mengembalikan semua pelanggaran. KRSManager menyimpan KRS valid lalu menerbitkan event.) Tj ET
+BT /F1 14 Tf 42 307 Td (NotificationService berlangganan melalui kontrak Subscriber.) Tj ET
+BT /F1 14 Tf 42 276 Td (Alternatif: Memeriksa dan mengirim email langsung dalam KRSManager lebih singkat, tetapi penggantian aturan atau) Tj ET
+BT /F1 14 Tf 42 257 Td (kanal pesan ikut mengubah pengelola KRS.) Tj ET
+BT /F1 14 Tf 42 226 Td (Konsekuensi: Validasi dapat diuji tanpa email. Pengiriman asinkron perlu percobaan ulang dan deduplikasi agar) Tj ET
+BT /F1 14 Tf 42 207 Td (dosen tidak menerima pesan ganda. Pattern: Observer.) Tj ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000185 00000 n 
+0000000312 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2428
+%%EOF

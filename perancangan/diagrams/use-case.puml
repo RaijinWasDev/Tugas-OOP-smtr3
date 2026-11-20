@@ -1,0 +1,28 @@
+@startuml
+left to right direction
+actor Mahasiswa as M
+actor "Dosen PA" as PA
+actor "Dosen pengampu" as DP
+actor Admin as A
+actor "Sistem PMB" as S
+actor CalonMahasiswa as C
+rectangle "Sevima Mini" {
+ (Daftar calon mahasiswa) as R
+ (Verifikasi berkas) as V
+ (Ajukan KRS) as K
+ (Periksa prasyarat) as P
+ (Tinjau KRS) as T
+ (Minta revisi KRS) as E
+ (Input nilai) as N
+ (Buat transkrip) as X
+}
+C -- R
+S -- R
+A -- V
+M -- K
+M -- X
+PA -- T
+DP -- N
+K ..> P : <<include>>
+E ..> T : <<extend>>\n[perlu perbaikan]
+@enduml

@@ -1,0 +1,37 @@
+sequenceDiagram
+actor M as Mahasiswa
+participant K as KRSManager
+participant V as KRSValidator
+participant R as Repository
+participant B as EventBus
+participant N as NotificationService
+actor D as Dosen
+M->>K: Ajukan KRS semester ini
+K->>V: Validasi semua pilihan
+activate V
+loop Setiap mata kuliah
+ V->>R: Baca prasyarat dan nilai semester lalu
+ R-->>V: Prasyarat dan nilai
+ opt Nilai prasyarat belum C atau belum ada
+ V->>V: Catat nama prasyarat yang belum lulus
+ end
+end
+V->>V: Hitung total SKS dan periksa duplikasi
+opt Total lebih dari 24 atau ada duplikasi
+ V->>V: Catat total SKS atau mata kuliah ganda
+end
+V->>V: Bandingkan hari serta interval jam setiap pasangan
+opt Jadwal bertumpuk
+ V->>V: Catat nama kedua mata kuliah
+end
+V-->>K: Daftar kesalahan
+deactivate V
+alt Ada kesalahan
+ K-->>M: Tampilkan semua kesalahan agar pilihan bisa diperbaiki
+else Semua syarat terpenuhi
+ K->>R: Simpan status SUBMITTED
+ K-)B: Terbitkan KRSDiajukan
+ K-->>M: Menunggu persetujuan
+ B-)N: Teruskan event ke subscriber
+ N-)D: Beri tahu dosen PA
+end
