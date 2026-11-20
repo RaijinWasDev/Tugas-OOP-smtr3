@@ -1,6 +1,6 @@
 Panduan versi sekarang: [jalankan portal dari folder utama](../../README.md). Catatan di bawah mendokumentasikan versi mingguan pada tag `minggu-06`.
 
-# Sevima Mini · Minggu 6
+# Sevima Mini Â· Minggu 6
 ## Menjalankan demo
 Buka PowerShell di folder minggu-06.
 ~~~powershell
@@ -25,10 +25,13 @@ Tabel empat transisi cukup kecil untuk diperiksa satu per satu. Submit mengulang
 Jalankan python -m pytest -q setelah dependensi terpasang. test_workflow.py memeriksa 32 kombinasi status dan peran, alur pengajuan dengan revisi, konflik versi, rollback jika notifikasi gagal, dan 1.000 percobaan acak dengan seed tetap. test_hypothesis.py menambahkan property test dengan max_examples=1000 menggunakan validator proyek dan pemeriksaan slot jadwal independen.
 
 ## Log AI dan OPAR
-Panji meminta implementasi dari video PBO minggu 06 dan modul KRS minggu 5–6. ChatGPT/Codex membuat migrasi, workflow, endpoint dan tes dari basis minggu kelima. Catatan teknis berbantuan AI untuk ditinjau saat rekaman:
+Panji meminta implementasi dari video PBO minggu 06 dan modul KRS minggu 5â€“6. ChatGPT/Codex membuat migrasi, workflow, endpoint dan tes dari basis minggu kelima. Catatan teknis berbantuan AI untuk ditinjau saat rekaman:
 - Observe: dua pihak bisa membaca versi pengajuan yang sama.
 - Plan: periksa identitas, status dan versi di dalam transaksi terkunci.
 - Act: implementasikan transisi, audit dan notifikasi; paksa penyimpanan notifikasi gagal pada database tes.
 - Reflect: rollback menjaga konsistensi dan nomor versi mendeteksi data lama. Login terverifikasi masih dibutuhkan bila dipakai di luar simulasi lokal.
 
 Tambahkan refleksi pribadi dan tautan commit setelah melakukan demo. Sumber video https://youtu.be/C66tdSW8kU4
+
+## Koreksi setelah persetujuan
+Admin bersama dosen PA dapat membuka kembali KRS melalui POST /api/krs/{nim}/{semester}/reopen dengan versi terbaru dan alasan. Setelah status menjadi revision, tambah atau hapus mata kuliah, lalu ajukan dan setujui kembali. Total SKS mengikuti pilihan mata kuliah.

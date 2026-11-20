@@ -14,7 +14,7 @@ from tugas.minggu_05_pengisian_krs.pengisian import KRSError
 @pytest.mark.parametrize("source,target,role",product(KRSStatus,KRSStatus,["mahasiswa","dosen"]))
 def test_transitions(source,target,role):
     valid={( "draft","submitted","mahasiswa"),("revision","submitted","mahasiswa"),
-           ("submitted","revision","dosen"),("submitted","approved","dosen")}
+           ("submitted","revision","dosen"),("submitted","approved","dosen"),("approved","revision","dosen")}
     if (source,target,role) in valid:
         check_transition(source,target,role)
     else:
@@ -46,6 +46,14 @@ def test_lifecycle_and_atomicity(demo):
         c.exec_driver_sql("DROP TRIGGER force_error")
     assert move("approve_krs","PA01",v)["status"]=="approved"
     with pytest.raises(KRSError):action(demo,"remove_course",1,"IF101")
+    reopened=move("reopen_krs","PA01",v+1,"Koreksi pilihan mata kuliah")
+    assert reopened["status"]=="revision"
+    with Session(e) as db:
+        assert db.scalar(text("SELECT approved_at FROM krs")) is None
+    edited=action(demo,"remove_course",1,"IF101")
+    assert edited["total_sks"]==3
+    submitted=move("submit_krs",nim,edited["version"])
+    assert move("approve_krs","PA01",submitted["version"])["status"]=="approved"
 
 def check_choices(choices):
     accepted=[]

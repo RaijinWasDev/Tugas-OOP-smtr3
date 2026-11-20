@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Akademik · Sevima Mini</title>
+<title>Admin Akademik Â· Sevima Mini</title>
 <link rel="stylesheet" href="/aset/admin.css">
 <header><strong>Sevima Mini</strong><span>Administrasi akademik</span><button id="logout" hidden>Keluar</button></header>
 <main>
@@ -11,6 +11,6 @@
 <label>Nama lengkap<input name="nama_lengkap" required></label><label>Email<input type="email" name="email" required></label><label>Nomor HP<input type="tel" name="phone" required></label><label>Tanggal lahir<input type="date" name="tanggal_lahir" required></label><label>Alamat<input name="alamat" required></label><label>Program studi<select name="program_studi_id"></select></label><label>Jalur masuk<select name="jalur_masuk_id"></select></label><button>Daftarkan</button></form></details><h2>Daftar pendaftar</h2><ul id="people"></ul></section>
 <section id="krs" hidden><h1>Kartu rencana studi</h1><label>Mahasiswa<select id="student"></select></label><label>Semester<input id="semester" type="number" min="1" value="1"></label><p id="summary"></p><ul id="courses"></ul>
 <form id="add"><label>Mata kuliah<select name="course"></select></label><button>Tambahkan</button></form>
-<button id="submitKrs">Ajukan sebagai mahasiswa</button><div id="review" hidden><button id="approve">Setujui sebagai dosen PA</button><form id="revise"><label>Catatan revisi<input required name="note"></label><button>Minta revisi</button></form></div></section>
+<button id="submitKrs">Ajukan sebagai mahasiswa</button><form id="reopen" hidden><label>Alasan koreksi<input name="note" required></label><button>Buka kembali KRS untuk edit SKS</button></form><div id="review" hidden><button id="approve">Setujui sebagai dosen PA</button><form id="revise"><label>Catatan revisi<input required name="note"></label><button>Minta revisi</button></form></div></section>
 <section id="jadwal" hidden><h1>Jadwal kuliah</h1><form id="schedule"><label>Mata kuliah<select name="kode"></select></label><label>Hari<select name="hari"></select></label><label>Mulai<input type="time" name="mulai" value="08:00" required></label><label>Selesai<input type="time" name="selesai" value="10:00" required></label><label>Ruangan<select name="ruangan"></select></label><label>Dosen<input name="dosen" required></label><button>Simpan jadwal</button></form><h2>Jadwal tersimpan</h2><ul id="slots"></ul></section></div>
 <p role="status" id="notice"></p></main><script type="module" src="/aset/admin.js"></script></html>
