@@ -69,3 +69,22 @@ def test_1000_reproducible():
     for _ in range(1000):
         check_choices([(rng.randint(1,4),rng.randint(1,5),rng.randint(8,17),rng.randint(1,3))
                        for _ in range(rng.randint(1,36))])
+
+def test_admin_edits_approved_courses(demo):
+    engine,nim=demo
+    draft=action(demo,"add_course",1,"IF102")
+    def call(method,*args,**kwargs):
+        with Session(engine) as db:
+            return getattr(KRSWorkflow(db),method)(nim,1,*args,**kwargs)
+    submitted=call("submit_krs",nim,draft["version"])
+    approved=call("approve_krs","PA01",submitted["version"])
+    version=approved["version"]
+    with pytest.raises(KRSError):
+        call("edit","IF102",approved_version=version)
+    corrected=call("edit","IF101",approved_version=version)
+    assert (corrected["status"],corrected["total_sks"])==("revision",6)
+    with pytest.raises(KRSError):
+        call("edit","IF101",remove=True,approved_version=version)
+    submitted=call("submit_krs",nim,corrected["version"])
+    approved=call("approve_krs","PA01",submitted["version"])
+    assert call("edit","IF101",remove=True,approved_version=approved["version"])["total_sks"]==3
