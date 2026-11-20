@@ -2,10 +2,10 @@
 
 ## Menjalankan portal admin di Windows
 
-Gunakan Python 3.11. Untuk demo minggu 8, ambil branch `tugas/minggu-08`. Pada instalasi pertama, jalankan di PowerShell:
+Gunakan Python 3.11. Untuk demo minggu 9, ambil branch `tugas/minggu-09`. Pada instalasi pertama, jalankan di PowerShell:
 
 ~~~powershell
-git clone --branch tugas/minggu-08 https://github.com/RaijinWasDev/Tugas-OOP-smtr3.git
+git clone --branch tugas/minggu-09 https://github.com/RaijinWasDev/Tugas-OOP-smtr3.git
 cd Tugas-OOP-smtr3
 python -m pip install -r requirements.txt
 .\Buka-Sevima.cmd
@@ -19,14 +19,16 @@ Tekan Ctrl+C di terminal untuk menghentikan server. Jika port 8007 sedang dipaka
 
 ## Tugas mingguan
 
-- [Minggu 1 — rancangan](tugas/minggu_01_rancangan/)
-- [Minggu 2 — uml](tugas/minggu_02_uml/)
-- [Minggu 3 — pendaftaran pmb](tugas/minggu_03_pendaftaran_pmb/)
-- [Minggu 4 — persetujuan pmb](tugas/minggu_04_persetujuan_pmb/)
-- [Minggu 5 — pengisian krs](tugas/minggu_05_pengisian_krs/)
-- [Minggu 6 — persetujuan krs](tugas/minggu_06_persetujuan_krs/)
-- [Minggu 7 — jadwal ruangan](tugas/minggu_07_jadwal_ruangan/)
+- [Minggu 1 ï¿½ rancangan](tugas/minggu_01_rancangan/)
+- [Minggu 2 ï¿½ uml](tugas/minggu_02_uml/)
+- [Minggu 3 ï¿½ pendaftaran pmb](tugas/minggu_03_pendaftaran_pmb/)
+- [Minggu 4 ï¿½ persetujuan pmb](tugas/minggu_04_persetujuan_pmb/)
+- [Minggu 5 ï¿½ pengisian krs](tugas/minggu_05_pengisian_krs/)
+- [Minggu 6 ï¿½ persetujuan krs](tugas/minggu_06_persetujuan_krs/)
+- [Minggu 7 ï¿½ jadwal ruangan](tugas/minggu_07_jadwal_ruangan/)
 
-[Pengumpulan UTS](UTS/README.md) · [Contoh pendaftar](contoh/pendaftar.json)
+[Pengumpulan UTS](UTS/README.md) ï¿½ [Contoh pendaftar](contoh/pendaftar.json)
 
 [Minggu 8 - Perubahan jadwal dan notifikasi](tugas/minggu_08_perubahan_jadwal/)
+
+- [Minggu 9 â€” input nilai, IPS/IPK dan riwayat](tugas/minggu_09_nilai/)

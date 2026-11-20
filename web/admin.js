@@ -117,6 +117,7 @@ async function show(tab){
   for(const btn of document.querySelectorAll('[data-tab]')){
     const active=btn.dataset.tab===tab;btn.setAttribute('aria-current',String(active));el(btn.dataset.tab).hidden=!active;
   }
+  if(tab==='nilai')await loadGrades();
   if(tab==='krs')await loadKrs();
   if(tab==='jadwal')await loadSlots();
 }
@@ -156,4 +157,35 @@ el('calendarExport').onsubmit=run(async()=>{
   const link=document.createElement('a');
   link.href=URL.createObjectURL(await response.blob());link.download='jadwal.ics';
   link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);
+});
+
+
+let grades = [];
+function selectedGrade() {return grades[el('gradeRow').selectedIndex];}
+async function displayGrade() {
+  const r=selectedGrade(), form=el('gradeForm');
+  form.reset();
+  el('history').replaceChildren();
+  el('gpa').textContent='';
+  form.hidden=!r || !r.dosen || r.presensi<75;
+  el('gradeInfo').textContent=r ? (r.dosen || 'Atur dosen di menu Jadwal')+' | Presensi demo '+r.presensi+'% | Nilai '+(r.nilai || 'belum diisi') : 'Setujui KRS terlebih dahulu.';
+  if(!r)return;
+  form.elements.huruf.value=r.nilai || 'A';
+  form.elements.alasan.required=Boolean(r.nilai);
+  const info=await api('/api/nilai/'+encodeURIComponent(r.nim)+'/'+r.semester);
+  if(selectedGrade()!==r)return;
+  el('gpa').textContent='IPS semester '+r.semester+' = '+info.ips+' | IPK sampai semester ini = '+info.ipk;
+  for(const h of info.riwayat)item(el('history'),[h.waktu+' UTC',h.kode_mk,(h.lama || 'Kosong')+' → '+h.baru,h.dosen,h.alasan].filter(Boolean).join(' | '));
+}
+async function loadGrades() {
+  grades=(await api('/api/nilai')).map(r=>({...r,key:r.id+'-'+r.kode_mk}));
+  options(el('gradeRow'),grades,'key',r=>r.nim+' | Semester '+r.semester+' | '+r.nama);
+  await displayGrade();
+}
+el('gradeRow').onchange=run(displayGrade);
+el('gradeForm').onsubmit=run(async()=>{
+  const r=selectedGrade();
+  await api('/api/nilai/'+r.id+'/'+encodeURIComponent(r.kode_mk),'PUT',Object.fromEntries(new FormData(el('gradeForm'))));
+  await loadGrades();
+  el('notice').textContent='Nilai tersimpan.';
 });
