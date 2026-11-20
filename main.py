@@ -24,3 +24,11 @@ async def invalid_input(request, exc):
     return JSONResponse(status_code=400, content={"detail": [
         {"field": ".".join(map(str, e["loc"])), "pesan": e["msg"]} for e in exc.errors()
     ]})
+
+from routers.krs import router as krs_router
+from services.krs import KRSError
+app.include_router(krs_router)
+
+@app.exception_handler(KRSError)
+async def invalid_krs(request, exc):
+    return JSONResponse(status_code=exc.status,content={"detail":str(exc)})

@@ -1,9 +1,0 @@
-[run]
-source = .
-omit =
-    test_*.py
-    migrations/*
-    migration_sql.py
-[report]
-fail_under = 80
-show_missing = True

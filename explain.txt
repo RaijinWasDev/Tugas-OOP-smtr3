@@ -1,0 +1,27 @@
+Pembanding sementara tanpa indeks
+SCAN p
+LIST SUBQUERY 2
+COMPOUND QUERY
+LEFT-MOST SUBQUERY
+SCAN krs_detail
+UNION USING TEMP B-TREE
+SCAN CONSTANT ROW
+CORRELATED SCALAR SUBQUERY 3
+SCAN k
+SCAN d
+SCAN m
+USE TEMP B-TREE FOR ORDER BY
+
+Skema proyek dengan indeks
+SEARCH p USING COVERING INDEX sqlite_autoindex_prerequisite_1 (kode_mk=?)
+LIST SUBQUERY 2
+COMPOUND QUERY
+LEFT-MOST SUBQUERY
+SEARCH krs_detail USING COVERING INDEX sqlite_autoindex_krs_detail_1 (krs_id=?)
+UNION USING TEMP B-TREE
+SCAN CONSTANT ROW
+CORRELATED SCALAR SUBQUERY 3
+SEARCH k USING INDEX sqlite_autoindex_krs_1 (nim=? AND semester<?)
+SEARCH d USING INDEX sqlite_autoindex_krs_detail_1 (krs_id=? AND kode_mk=?)
+SEARCH m USING INDEX sqlite_autoindex_matakuliah_1 (kode=?)
+USE TEMP B-TREE FOR RIGHT PART OF ORDER BY

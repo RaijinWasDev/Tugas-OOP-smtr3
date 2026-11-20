@@ -6,5 +6,6 @@
 - [Minggu 2 — Diagram UML](progres/minggu-02.md)
 - [Minggu 3 — Pendaftaran PMB](progres/minggu-03.md)
 - [Minggu 4 — Persetujuan PMB](progres/minggu-04.md)
+- [Minggu 5 — Pengisian KRS](progres/minggu-05.md)
 
 [Laporan final UML](perancangan/docs/Final-UML.pdf)
