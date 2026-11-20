@@ -1,6 +1,21 @@
 # Sevima Mini
 
-Jalankan `python -m pip install -r requirements.txt` dari folder utama, lalu buka `Buka-Sevima.cmd`. Masuk ke http://127.0.0.1:8007/admin dengan kunci dari terminal.
+## Menjalankan portal admin di Windows
+
+Gunakan Python 3.11. Untuk demo UTS, ambil branch `main`. Pada instalasi pertama, jalankan di PowerShell:
+
+~~~powershell
+git clone --branch main https://github.com/RaijinWasDev/Tugas-OOP-smtr3.git
+cd Tugas-OOP-smtr3
+python -m pip install -r requirements.txt
+.\Buka-Sevima.cmd
+~~~
+
+Jika sudah mengunduh dan mengekstrak ZIP dari GitHub, buka terminal di folder yang berisi `main.py`, lalu jalankan dua perintah terakhir. Untuk pemakaian berikutnya cukup buka `Buka-Sevima.cmd` di folder tersebut.
+
+Setelah terminal menampilkan **Uvicorn running**, buka http://127.0.0.1:8007/admin di laptop yang menjalankan program. Gunakan kunci admin dari terminal itu. Launcher menyiapkan database lokal saat pertama dijalankan. Untuk demo dengan database baru, mulai dari menu Pendaftaran.
+
+Tekan Ctrl+C di terminal untuk menghentikan server. Jika port 8007 sedang dipakai, hentikan server lama atau jalankan `.\Buka-Sevima.cmd 8008` dan buka alamat yang tercetak. Kedua port menjalankan aplikasi dan database dari folder proyek yang sama.
 
 ## Tugas mingguan
 

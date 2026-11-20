@@ -37,13 +37,13 @@ async function loadPeople() {
   data=await api('/admin/data');
   options(fields('register').program_studi_id,data.prodi,'id',r=>r.nama);
   options(fields('register').jalur_masuk_id,data.jalur,'id',r=>r.nama);
-  options(el('student'),data.pendaftar.filter(p=>p.nim),'nim',p=>p.nama_lengkap+' Â· '+p.nim);
+  options(el('student'),data.pendaftar.filter(p=>p.nim),'nim',p=>p.nama_lengkap+' \u00b7 '+p.nim);
   for(const select of [fields('schedule').kode,fields('add').course]) options(select,data.kuliah,'kode',c=>c.nama);
-  options(fields('schedule').ruangan,data.ruang,'kode',r=>r.kode+' Â· '+r.kapasitas+' kursi');
+  options(fields('schedule').ruangan,data.ruang,'kode',r=>r.kode+' \u00b7 '+r.kapasitas+' kursi');
   const list=el('people');list.replaceChildren();
   if(!data.pendaftar.length)item(list,'Belum ada pendaftar.');
   for(const p of data.pendaftar){
-    item(list,p.nama_lengkap+' Â· '+(p.nim || 'Menunggu persetujuan'),'Setujui',p.status==='pending'?async()=>{
+    item(list,p.nama_lengkap+' \u00b7 '+(p.nim || 'Menunggu persetujuan'),'Setujui',p.status==='pending'?async()=>{
       const approved=await api('/api/pmb/approve/'+p.id,'PUT');await loadPeople();
       el('student').value=approved.nim;el('notice').textContent='Pendaftaran disetujui. NIM '+approved.nim;
     }:null);
@@ -61,7 +61,7 @@ async function loadKrs(){
   try{record=await api(krsPath()+'/validasi');}catch(e){if(e.status!==404)throw e;}
   if(request!==generation)return;
   current=record;
-  el('summary').textContent=record?[statusText[record.status],record.total_sks+' SKS',record.catatan].filter(Boolean).join(' Â· '):'Belum ada mata kuliah yang dipilih.';
+  el('summary').textContent=record?[statusText[record.status],record.total_sks+' SKS',record.catatan].filter(Boolean).join(' \u00b7 '):'Belum ada mata kuliah yang dipilih.';
   const editable=!record || ['draft','revision','approved'].includes(record.status);
   for(const code of record?.mata_kuliah || [])item(el('courses'),courseName(code),'Hapus',editable?async()=>{await editCourse(code,'DELETE');}:null);
   el('add').hidden=!editable;el('submitKrs').hidden=!editable || record?.status==='approved' || !record?.mata_kuliah.length;
@@ -85,7 +85,7 @@ const minutes=t=>Number(t.slice(0,2))*60+Number(t.slice(3));
 async function loadSlots(){
   const rows=await api('/jadwal'), list=el('slots');list.replaceChildren();
   if(!rows.length)item(list,'Belum ada jadwal.');
-  for(const r of rows)item(list,[courseName(r.kode),days[r.hari-1],clock(r.mulai)+'â€“'+clock(r.selesai),r.ruangan,r.dosen].join(' Â· '),'Hapus',async()=>{
+  for(const r of rows)item(list,[courseName(r.kode),days[r.hari-1],clock(r.mulai)+'\u2013'+clock(r.selesai),r.ruangan,r.dosen].join(' \u00b7 '),'Hapus',async()=>{
     if(confirm('Hapus jadwal '+courseName(r.kode)+'?')){await api('/jadwal/'+r.kode,'DELETE');await loadSlots();}
   });
 }
