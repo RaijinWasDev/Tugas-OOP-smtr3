@@ -7,8 +7,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text
 from test_krs import demo, action
 from test_pmb import engine
-from services.workflow import KRSWorkflow, check_transition, KRSStatus
-from services.krs import KRSError, SKSValidator, ConflictValidator
+from tugas.minggu_06_persetujuan_krs.alur_krs import KRSWorkflow, check_transition, KRSStatus
+from tugas.minggu_05_pengisian_krs.aturan_krs import SKSValidator, ConflictValidator
+from tugas.minggu_05_pengisian_krs.pengisian import KRSError
 
 @pytest.mark.parametrize("source,target,role",product(KRSStatus,KRSStatus,["mahasiswa","dosen"]))
 def test_transitions(source,target,role):

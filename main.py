@@ -3,13 +3,19 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from routers import admin, jadwal, krs, pmb
-from services.krs import KRSError
+from routers import admin
+from routers.akses import require_admin
+from tugas.minggu_03_pendaftaran_pmb import api as pendaftaran
+from tugas.minggu_04_persetujuan_pmb import api as persetujuan
+from tugas.minggu_05_pengisian_krs import api as pengisian
+from tugas.minggu_06_persetujuan_krs import api as workflow
+from tugas.minggu_07_jadwal_ruangan import jadwal
+from tugas.minggu_05_pengisian_krs.pengisian import KRSError
 
 app = FastAPI(title="Sevima Mini", description="Administrasi PMB, KRS, dan jadwal kuliah")
-akses_admin = [Depends(pmb.require_admin)]
+akses_admin = [Depends(require_admin)]
 app.include_router(admin.router)
-for modul in (pmb, krs, jadwal):
+for modul in (pendaftaran, persetujuan, pengisian, workflow, jadwal):
     app.include_router(modul.router, dependencies=akses_admin)
 app.mount("/aset", StaticFiles(directory=admin.WEB), name="aset")
 

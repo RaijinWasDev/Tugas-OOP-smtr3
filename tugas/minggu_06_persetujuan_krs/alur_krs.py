@@ -1,5 +1,5 @@
 from enum import StrEnum
-from services.krs import KRSError, KRSManager
+from tugas.minggu_05_pengisian_krs.pengisian import KRSError, KRSManager
 
 class KRSStatus(StrEnum):
     DRAFT="draft"

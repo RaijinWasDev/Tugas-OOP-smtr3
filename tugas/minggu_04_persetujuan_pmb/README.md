@@ -1,3 +1,5 @@
+Panduan versi sekarang: [jalankan portal dari folder utama](../../README.md). Catatan di bawah mendokumentasikan versi mingguan pada tag `minggu-04`.
+
 # PMB minggu 4
 Mulai dari terminal PowerShell pada folder minggu-04. Gunakan instalasi Python 3.11 yang memiliki paket berikut.
 

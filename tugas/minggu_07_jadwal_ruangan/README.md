@@ -1,3 +1,5 @@
+Panduan versi sekarang: [jalankan portal dari folder utama](../../README.md). Catatan di bawah mendokumentasikan versi mingguan pada tag `minggu-07`.
+
 # Portal Admin Sevima Mini
 
 Jalankan Buka-Sevima.cmd, tunggu sampai server aktif, lalu buka http://127.0.0.1:8007/admin. Gunakan kunci dari terminal. Jika paket Python belum tersedia, jalankan python -m pip install -r requirements.txt di folder ini.

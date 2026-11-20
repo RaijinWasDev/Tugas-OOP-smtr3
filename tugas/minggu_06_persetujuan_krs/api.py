@@ -1,26 +1,10 @@
-from typing import Annotated
-from fastapi import APIRouter,Depends,Path
+from fastapi import APIRouter, Depends, Header
 from database import get_db
-from services.krs import KRSManager
+from tugas.minggu_05_pengisian_krs.api import Semester
+router=APIRouter(prefix="/api/krs", tags=["KRS"])
 
-router=APIRouter(prefix="/api/krs",tags=["KRS"])
-Semester=Annotated[int,Path(gt=0)]
-
-@router.post("/{nim}/{semester}/mata-kuliah/{kode}",status_code=201)
-def tambah(nim:str,semester:Semester,kode:str,db=Depends(get_db)):
-    return KRSManager(db).add_course(nim,semester,kode)
-
-@router.delete("/{nim}/{semester}/mata-kuliah/{kode}")
-def hapus(nim:str,semester:Semester,kode:str,db=Depends(get_db)):
-    return KRSManager(db).remove_course(nim,semester,kode)
-
-@router.get("/{nim}/{semester}/validasi")
-def validasi(nim:str,semester:Semester,db=Depends(get_db)):
-    return KRSManager(db).validate_krs(nim,semester)
-
-from fastapi import Header
 from pydantic import BaseModel, Field
-from services.workflow import KRSWorkflow
+from tugas.minggu_06_persetujuan_krs.alur_krs import KRSWorkflow
 
 class Versi(BaseModel):
     version: int = Field(ge=1)

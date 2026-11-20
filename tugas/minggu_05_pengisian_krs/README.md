@@ -1,3 +1,5 @@
+Panduan versi sekarang: [jalankan portal dari folder utama](../../README.md). Catatan di bawah mendokumentasikan versi mingguan pada tag `minggu-05`.
+
 # KRS · Minggu 5
 Proyek memuat API PMB minggu keempat dan API KRS. Dari terminal PowerShell di folder ini:
 

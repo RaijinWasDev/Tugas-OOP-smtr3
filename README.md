@@ -1,17 +1,15 @@
 # Sevima Mini
 
-## Progres mingguan
+Jalankan `python -m pip install -r requirements.txt` dari folder utama, lalu buka `Buka-Sevima.cmd`. Masuk ke http://127.0.0.1:8007/admin dengan kunci dari terminal.
 
-- [Minggu 1 — Rancangan awal](progres/minggu-01.md)
-- [Minggu 2 — Diagram UML](progres/minggu-02.md)
-- [Minggu 3 — Pendaftaran PMB](progres/minggu-03.md)
-- [Minggu 4 — Persetujuan PMB](progres/minggu-04.md)
-- [Minggu 5 — Pengisian KRS](progres/minggu-05.md)
-- [Minggu 6 — Persetujuan KRS](progres/minggu-06.md)
-- [Minggu 7 — Jadwal dan portal admin](progres/minggu-07.md)
+## Tugas mingguan
 
-[Laporan final UML](perancangan/docs/Final-UML.pdf)
+- [Minggu 1 — rancangan](tugas/minggu_01_rancangan/)
+- [Minggu 2 — uml](tugas/minggu_02_uml/)
+- [Minggu 3 — pendaftaran pmb](tugas/minggu_03_pendaftaran_pmb/)
+- [Minggu 4 — persetujuan pmb](tugas/minggu_04_persetujuan_pmb/)
+- [Minggu 5 — pengisian krs](tugas/minggu_05_pengisian_krs/)
+- [Minggu 6 — persetujuan krs](tugas/minggu_06_persetujuan_krs/)
+- [Minggu 7 — jadwal ruangan](tugas/minggu_07_jadwal_ruangan/)
 
-## Demo UTS
-
-Jalankan Buka-Sevima.cmd dari folder proyek, lalu buka http://127.0.0.1:8007/admin. Ikuti alur Pendaftaran, KRS, lalu Jadwal. Tag minggu-01 hingga minggu-07 menandai versi tiap tahap. Tag uts menandai versi presentasi. Riwayat ini disusun dari arsip mingguan.
+[Pengumpulan UTS](UTS/README.md) · [Contoh pendaftar](contoh/pendaftar.json)

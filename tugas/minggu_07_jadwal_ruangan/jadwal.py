@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import text
 
 from database import get_db
-from routers.pmb import require_admin
+from routers.akses import require_admin
 
 router = APIRouter()
 ADMIN = [Depends(require_admin)]

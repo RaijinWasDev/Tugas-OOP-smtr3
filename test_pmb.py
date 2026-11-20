@@ -10,8 +10,10 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 
 from migration_sql import UP, DOWN
-from routers.pmb import daftar, cek_status, setujui, statistik, require_admin
-from schemas.pmb import RegisterRequest
+from tugas.minggu_03_pendaftaran_pmb.api import daftar
+from tugas.minggu_04_persetujuan_pmb.api import cek_status, setujui, statistik
+from routers.akses import require_admin
+from tugas.minggu_03_pendaftaran_pmb.validasi_pendaftar import RegisterRequest
 from main import app
 
 @pytest.fixture
@@ -24,7 +26,7 @@ def engine(tmp_path):
     engine.dispose()
 
 def data(**extra):
-    raw = json.loads(Path(__file__).with_name("contoh.json").read_text())
+    raw = json.loads((Path(__file__).parent / "contoh" / "pendaftar.json").read_text())
     return RegisterRequest(**(raw | extra))
 
 def enroll(engine, **extra):

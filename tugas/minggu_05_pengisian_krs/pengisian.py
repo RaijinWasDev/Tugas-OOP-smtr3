@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from .aturan_krs import RULES, PrerequisiteValidator
 from sqlalchemy import text
 
 MISSING = """SELECT p.kode_mk,m.nama FROM prerequisite p JOIN matakuliah m ON m.kode=p.syarat
@@ -7,37 +6,6 @@ MISSING = """SELECT p.kode_mk,m.nama FROM prerequisite p JOIN matakuliah m ON m.
  AND NOT EXISTS (SELECT 1 FROM krs k JOIN krs_detail d ON d.krs_id=k.id
  WHERE k.nim=:nim AND k.semester<:semester AND k.status='approved'
  AND d.kode_mk=p.syarat AND d.bobot>=2) ORDER BY p.kode_mk,m.nama"""
-
-@dataclass(frozen=True)
-class ValidationResult:
-    passed: bool
-    message: str = ""
-
-class Validator(ABC):
-    @abstractmethod
-    def check(self, course, others, missing):
-        pass
-
-class DuplicateValidator(Validator):
-    def check(self,c,others,missing):
-        return ValidationResult(all(x.kode!=c.kode for x in others), f"{c.nama} sudah dipilih")
-
-class SKSValidator(Validator):
-    def check(self,c,others,missing):
-        total=c.sks+sum(x.sks for x in others)
-        return ValidationResult(total<=24,f"Total {total} SKS melebihi batas 24")
-
-class PrerequisiteValidator(Validator):
-    def check(self,c,others,missing):
-        names=missing.get(c.kode,[])
-        return ValidationResult(not names,f"{c.nama} memerlukan kelulusan: "+", ".join(names))
-
-class ConflictValidator(Validator):
-    def check(self,c,others,missing):
-        names=[x.nama for x in others if x.hari==c.hari and x.mulai<c.selesai and c.mulai<x.selesai]
-        return ValidationResult(not names,f"{c.nama} bentrok dengan "+", ".join(names))
-
-RULES=(DuplicateValidator(),SKSValidator(),PrerequisiteValidator(),ConflictValidator())
 
 class KRSError(ValueError):
     def __init__(self,message,status=400):

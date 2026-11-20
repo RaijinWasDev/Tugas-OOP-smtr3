@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 import pytest
 from test_pmb import engine, enroll, approve
-from services.krs import KRSManager, KRSError, MISSING
+from tugas.minggu_05_pengisian_krs.pengisian import KRSManager, KRSError, MISSING
 
 @pytest.fixture
 def demo(engine):

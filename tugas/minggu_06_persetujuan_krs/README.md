@@ -1,3 +1,5 @@
+Panduan versi sekarang: [jalankan portal dari folder utama](../../README.md). Catatan di bawah mendokumentasikan versi mingguan pada tag `minggu-06`.
+
 # Sevima Mini · Minggu 6
 ## Menjalankan demo
 Buka PowerShell di folder minggu-06.

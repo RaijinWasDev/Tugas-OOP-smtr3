@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import text
 
 from database import get_db
-from routers.pmb import require_admin
+from routers.akses import require_admin
 
 router = APIRouter()
 WEB = Path(__file__).resolve().parents[1] / "web"

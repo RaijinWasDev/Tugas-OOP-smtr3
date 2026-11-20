@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from models.pmb import CalonMahasiswa, JalurMasuk, ProgramStudi
+from tugas.minggu_03_pendaftaran_pmb.model import CalonMahasiswa, JalurMasuk, ProgramStudi
 
 class EmailTerdaftar(Exception):
     pass

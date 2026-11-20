@@ -1,3 +1,5 @@
+Panduan versi sekarang: [jalankan portal dari folder utama](../../README.md). Catatan di bawah mendokumentasikan versi mingguan pada tag `minggu-03`.
+
 # PMB minggu 3
 Buka terminal di folder minggu-03. Perintah berikut untuk PowerShell di laptop Panji.
 ```powershell
