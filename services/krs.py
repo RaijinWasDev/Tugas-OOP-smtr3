@@ -90,6 +90,7 @@ class KRSManager:
                     if not check.passed:
                         raise KRSError(check.message)
                 self.query("INSERT INTO krs_detail(krs_id,kode_mk) VALUES(:id,:kode)",id=id,kode=kode)
+            self.query("UPDATE krs SET version=version+1 WHERE id=:id",id=id)
             return self.summary(id,krs.status if krs else "draft")
 
     def add_course(self,nim,semester,kode):
@@ -100,7 +101,8 @@ class KRSManager:
 
     def summary(self,id,status):
         courses=self.courses(id)
-        return {"status":status,"mata_kuliah":[c.kode for c in courses],"total_sks":sum(c.sks for c in courses)}
+        meta=self.query("SELECT version,dosen_pa_id,catatan FROM krs WHERE id=:id",id=id).mappings().one()
+        return {**meta,"status":status,"mata_kuliah":[c.kode for c in courses],"total_sks":sum(c.sks for c in courses)}
 
     def validate_krs(self,nim,semester):
         k=self.header(nim,semester)
@@ -116,3 +118,4 @@ class KRSManager:
                 if not result.passed and result.message not in errors:
                     errors.append(result.message)
         return {**self.summary(k.id,k.status),"valid":not errors,"kesalahan":errors}
+

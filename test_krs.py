@@ -17,6 +17,10 @@ def demo(engine):
         from alembic.migration import MigrationContext
         with Operations.context(MigrationContext.configure(conn)):
             mod.upgrade()
+            next_spec=importlib.util.spec_from_file_location("workflow_migration","migrations/versions/003_workflow.py")
+            workflow=importlib.util.module_from_spec(next_spec)
+            next_spec.loader.exec_module(workflow)
+            workflow.upgrade()
     nim=approve(engine,enroll(engine))[0]
     return engine,nim
 
@@ -63,3 +67,4 @@ def test_two_requests_from_21_sks(demo):
     with ThreadPoolExecutor(2) as pool: results=list(pool.map(attempt,["7","8"]))
     assert 24 in results and "Total 27 SKS melebihi batas 24" in results
     assert action(demo,"validate_krs",1)["total_sks"]==24
+
