@@ -37,13 +37,13 @@ async function loadPeople() {
   data=await api('/admin/data');
   options(fields('register').program_studi_id,data.prodi,'id',r=>r.nama);
   options(fields('register').jalur_masuk_id,data.jalur,'id',r=>r.nama);
-  options(el('student'),data.pendaftar.filter(p=>p.nim),'nim',p=>p.nama_lengkap+' · '+p.nim);
+  options(el('student'),data.pendaftar.filter(p=>p.nim),'nim',p=>p.nama_lengkap+' Â· '+p.nim);
   for(const select of [fields('schedule').kode,fields('add').course]) options(select,data.kuliah,'kode',c=>c.nama);
-  options(fields('schedule').ruangan,data.ruang,'kode',r=>r.kode+' · '+r.kapasitas+' kursi');
+  options(fields('schedule').ruangan,data.ruang,'kode',r=>r.kode+' Â· '+r.kapasitas+' kursi');
   const list=el('people');list.replaceChildren();
   if(!data.pendaftar.length)item(list,'Belum ada pendaftar.');
   for(const p of data.pendaftar){
-    item(list,p.nama_lengkap+' · '+(p.nim || 'Menunggu persetujuan'),'Setujui',p.status==='pending'?async()=>{
+    item(list,p.nama_lengkap+' Â· '+(p.nim || 'Menunggu persetujuan'),'Setujui',p.status==='pending'?async()=>{
       const approved=await api('/api/pmb/approve/'+p.id,'PUT');await loadPeople();
       el('student').value=approved.nim;el('notice').textContent='Pendaftaran disetujui. NIM '+approved.nim;
     }:null);
@@ -54,22 +54,23 @@ async function loadKrs(){
   const request=++generation;
   current=null;
   el('courses').replaceChildren();
-  for(const id of ['add','submitKrs','review'])el(id).hidden=true;
+  for(const id of ['add','submitKrs','review','reopen'])el(id).hidden=true;
   if(!el('student').value){el('summary').textContent='Setujui pendaftar di menu Pendaftaran untuk membuat KRS.';return;}
   if(!el('semester').validity.valid || !el('semester').value){el('summary').textContent='Pilih semester mulai dari 1.';return;}
   let record;
   try{record=await api(krsPath()+'/validasi');}catch(e){if(e.status!==404)throw e;}
   if(request!==generation)return;
   current=record;
-  el('summary').textContent=record?[statusText[record.status],record.total_sks+' SKS',record.catatan].filter(Boolean).join(' · '):'Belum ada mata kuliah yang dipilih.';
+  el('summary').textContent=record?[statusText[record.status],record.total_sks+' SKS',record.catatan].filter(Boolean).join(' Â· '):'Belum ada mata kuliah yang dipilih.';
   const editable=!record || ['draft','revision'].includes(record.status);
   for(const code of record?.mata_kuliah || [])item(el('courses'),courseName(code),'Hapus',editable?async()=>{await api(krsPath()+'/mata-kuliah/'+code,'DELETE');await loadKrs();}:null);
   el('add').hidden=!editable;el('submitKrs').hidden=!editable || !record?.mata_kuliah.length;
+  el('reopen').hidden=record?.status!=='approved';
   el('review').hidden=record?.status!=='submitted';
 }
 async function transition(action){
   const body={version:current.version};
-  if(action==='revise')body.catatan=fields('revise').note.value;
+  if(['revise','reopen'].includes(action))body.catatan=fields(action).note.value;
   const headers=action==='submit'?{'X-Nim':el('student').value}:{'X-Dosen-Pa':current.dosen_pa_id};
   try{await api(krsPath()+'/'+action,'POST',body,headers);}finally{await loadKrs();}
 }
@@ -78,7 +79,7 @@ const minutes=t=>Number(t.slice(0,2))*60+Number(t.slice(3));
 async function loadSlots(){
   const rows=await api('/jadwal'), list=el('slots');list.replaceChildren();
   if(!rows.length)item(list,'Belum ada jadwal.');
-  for(const r of rows)item(list,[courseName(r.kode),days[r.hari-1],clock(r.mulai)+'–'+clock(r.selesai),r.ruangan,r.dosen].join(' · '),'Hapus',async()=>{
+  for(const r of rows)item(list,[courseName(r.kode),days[r.hari-1],clock(r.mulai)+'â€“'+clock(r.selesai),r.ruangan,r.dosen].join(' Â· '),'Hapus',async()=>{
     if(confirm('Hapus jadwal '+courseName(r.kode)+'?')){await api('/jadwal/'+r.kode,'DELETE');await loadSlots();}
   });
 }
@@ -104,6 +105,7 @@ for(const id of ['student','semester'])el(id).onchange=run(loadKrs);
 el('add').onsubmit=run(async()=>{await api(krsPath()+'/mata-kuliah/'+fields('add').course.value,'POST');await loadKrs();});
 el('submitKrs').onclick=run(()=>transition('submit'));
 el('approve').onclick=run(()=>transition('approve'));
+el('reopen').onsubmit=run(async()=>{await transition('reopen');el('reopen').reset();});
 el('revise').onsubmit=run(()=>transition('revise'));
 days.forEach((d,i)=>fields('schedule').hari.add(new Option(d,i+1)));
 el('schedule').onsubmit=run(async()=>{

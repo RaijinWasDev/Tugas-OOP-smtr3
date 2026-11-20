@@ -8,6 +8,7 @@ class KRSStatus(StrEnum):
     APPROVED="approved"
 
 ALLOWED={
+    (KRSStatus.APPROVED,KRSStatus.REVISION):"dosen",
     (KRSStatus.DRAFT,KRSStatus.SUBMITTED):"mahasiswa",
     (KRSStatus.REVISION,KRSStatus.SUBMITTED):"mahasiswa",
     (KRSStatus.SUBMITTED,KRSStatus.REVISION):"dosen",
@@ -21,7 +22,7 @@ def check_transition(source,target,role):
         raise KRSError("Peran tidak berwenang",403)
 
 class KRSWorkflow(KRSManager):
-    def transition(self,nim,semester,target,role,actor,version,note=None):
+    def transition(self,nim,semester,target,role,actor,version,note=None,expected_status=None):
         with self.db.begin():
             self.query("BEGIN IMMEDIATE")
             k=self.header(nim,semester)
@@ -33,6 +34,8 @@ class KRSWorkflow(KRSManager):
                 raise KRSError("Aktor tidak berhak atas KRS ini",403)
             if version!=k.version:
                 raise KRSError("Versi lama. Muat ulang KRS.",409)
+            if expected_status is not None and k.status != expected_status:
+                raise KRSError("Status KRS telah berubah. Muat ulang KRS.",409)
             check_transition(k.status,target,role)
             if target==KRSStatus.SUBMITTED:
                 report=self.validate_krs(nim,semester)
@@ -42,7 +45,7 @@ class KRSWorkflow(KRSManager):
                 raise KRSError("Catatan revisi wajib diisi")
             self.query("""UPDATE krs SET status=:target,version=version+1,catatan=:note,
                 submitted_at=CASE WHEN :target='submitted' THEN CURRENT_TIMESTAMP ELSE submitted_at END,
-                approved_at=CASE WHEN :target='approved' THEN CURRENT_TIMESTAMP ELSE approved_at END
+                approved_at=CASE WHEN :target='approved' THEN CURRENT_TIMESTAMP WHEN :target='revision' THEN NULL ELSE approved_at END
                 WHERE id=:id""",target=target,note=note,id=k.id)
             self.query("""INSERT INTO krs_log(krs_id,asal,tujuan,aktor,catatan)
                 VALUES(:id,:old,:new,:actor,:note)""",id=k.id,old=k.status,new=target,actor=actor,note=note)
@@ -57,4 +60,8 @@ class KRSWorkflow(KRSManager):
         return self.transition(nim,semester,KRSStatus.APPROVED,"dosen",dosen_pa_id,version)
 
     def revise_krs(self,nim,semester,dosen_pa_id,version,note):
-        return self.transition(nim,semester,KRSStatus.REVISION,"dosen",dosen_pa_id,version,note)
+        return self.transition(nim,semester,KRSStatus.REVISION,"dosen",dosen_pa_id,version,note,expected_status=KRSStatus.SUBMITTED)
+
+    def reopen_krs(self, nim, semester, dosen_pa_id, version, note):
+        return self.transition(nim, semester, KRSStatus.REVISION, "dosen", dosen_pa_id,
+                               version, note, expected_status=KRSStatus.APPROVED)
