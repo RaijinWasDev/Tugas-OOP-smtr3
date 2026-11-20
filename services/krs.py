@@ -66,11 +66,21 @@ class KRSManager:
             result.setdefault(key,[]).append(name)
         return result
 
-    def edit(self,nim,semester,kode,remove=False):
+    def edit(self,nim,semester,kode,remove=False,approved_version=None):
         with self.db.begin():
             self.query("BEGIN IMMEDIATE")
             krs=self.header(nim,semester)
-            if krs and krs.status not in ("draft","revision"):
+            if approved_version is not None:
+                if not krs or krs.status != "approved" or krs.version != approved_version:
+                    raise KRSError("KRS telah berubah. Muat ulang untuk melanjutkan.",409)
+                note = ("Hapus " if remove else "Tambah ") + kode
+                self.query("""UPDATE krs SET status='revision', approved_at=NULL, catatan=:note
+                              WHERE id=:id""", id=krs.id, note=note)
+                self.query("""INSERT INTO krs_log(krs_id,asal,tujuan,aktor,catatan)
+                              VALUES(:id,'approved','revision','admin',:note)""", id=krs.id,note=note)
+                self.query("""INSERT INTO notifikasi(krs_id,penerima,pesan) VALUES(:id,:nim,:note)""",
+                           id=krs.id,nim=nim,note="KRS dikoreksi admin: "+note)
+            elif krs and krs.status not in ("draft","revision"):
                 raise KRSError("KRS hanya dapat diubah saat draft atau revision",409)
             course=self.query("SELECT * FROM matakuliah WHERE kode=:kode",kode=kode).first()
             if not course:
@@ -91,7 +101,8 @@ class KRSManager:
                         raise KRSError(check.message)
                 self.query("INSERT INTO krs_detail(krs_id,kode_mk) VALUES(:id,:kode)",id=id,kode=kode)
             self.query("UPDATE krs SET version=version+1 WHERE id=:id",id=id)
-            return self.summary(id,krs.status if krs else "draft")
+            status = "revision" if approved_version is not None else (krs.status if krs else "draft")
+            return self.summary(id,status)
 
     def add_course(self,nim,semester,kode):
         return self.edit(nim,semester,kode)

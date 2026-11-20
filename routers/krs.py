@@ -44,3 +44,12 @@ def revise(nim:str,semester:Semester,data:Revisi,x_dosen_pa:str=Header(),db=Depe
 @router.post("/{nim}/{semester}/reopen", dependencies=[Depends(require_admin)])
 def reopen(nim: str, semester: Semester, data: Revisi, x_dosen_pa: str = Header(), db=Depends(get_db)):
     return KRSWorkflow(db).reopen_krs(nim, semester, x_dosen_pa, data.version, data.catatan)
+
+@router.post("/{nim}/{semester}/koreksi/{kode}", dependencies=[Depends(require_admin)])
+def tambah_setelah_disetujui(nim: str, semester: Semester, kode: str, version: int, db=Depends(get_db)):
+    return KRSWorkflow(db).edit(nim, semester, kode, approved_version=version)
+
+
+@router.delete("/{nim}/{semester}/koreksi/{kode}", dependencies=[Depends(require_admin)])
+def hapus_setelah_disetujui(nim: str, semester: Semester, kode: str, version: int, db=Depends(get_db)):
+    return KRSWorkflow(db).edit(nim, semester, kode, remove=True, approved_version=version)
