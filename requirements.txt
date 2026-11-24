@@ -7,3 +7,4 @@ pytest
 pytest-cov
 httpx
 hypothesis
+APScheduler>=3.10,<4

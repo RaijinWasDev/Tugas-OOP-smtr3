@@ -2,10 +2,10 @@
 
 ## Menjalankan portal admin di Windows
 
-Gunakan Python 3.11. Untuk demo minggu 9, ambil branch `tugas/minggu-09`. Pada instalasi pertama, jalankan di PowerShell:
+Gunakan Python 3.11. Untuk demo minggu 11, ambil branch `tugas/minggu-11`. Pada instalasi pertama, jalankan di PowerShell:
 
 ~~~powershell
-git clone --branch tugas/minggu-09 https://github.com/RaijinWasDev/Tugas-OOP-smtr3.git
+git clone --branch tugas/minggu-11 https://github.com/RaijinWasDev/Tugas-OOP-smtr3.git
 cd Tugas-OOP-smtr3
 python -m pip install -r requirements.txt
 .\Buka-Sevima.cmd
@@ -32,3 +32,5 @@ Tekan Ctrl+C di terminal untuk menghentikan server. Jika port 8007 sedang dipaka
 [Minggu 8 - Perubahan jadwal dan notifikasi](tugas/minggu_08_perubahan_jadwal/)
 
 - [Minggu 9 — input nilai, IPS/IPK dan riwayat](tugas/minggu_09_nilai/)
+
+- [Minggu 11 — Keuangan SPP](tugas/minggu_11_keuangan/)

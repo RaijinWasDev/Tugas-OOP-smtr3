@@ -1,5 +1,6 @@
 from .aturan_krs import RULES, PrerequisiteValidator
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 
 MISSING = """SELECT p.kode_mk,m.nama FROM prerequisite p JOIN matakuliah m ON m.kode=p.syarat
  WHERE p.kode_mk IN (SELECT kode_mk FROM krs_detail WHERE krs_id=:id UNION SELECT :kode)
@@ -17,7 +18,12 @@ class KRSManager:
         self.db=db
 
     def query(self,sql,**args):
-        return self.db.execute(text(sql),args)
+        try:
+            return self.db.execute(text(sql),args)
+        except IntegrityError as exc:
+            if str(exc.orig) == "SPP tertunggak":
+                raise KRSError("Lunasi tunggakan SPP sebelum mengisi atau mengajukan KRS.", 409) from exc
+            raise
 
     def header(self,nim,semester):
         if not self.query("SELECT 1 FROM calon_mahasiswa WHERE nim=:nim AND status='approved'",nim=nim).first():
@@ -97,4 +103,5 @@ class KRSManager:
                 if not result.passed and result.message not in errors:
                     errors.append(result.message)
         return {**self.summary(k.id,k.status),"valid":not errors,"kesalahan":errors}
+
 

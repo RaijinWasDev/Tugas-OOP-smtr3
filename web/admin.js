@@ -117,6 +117,7 @@ async function show(tab){
   for(const btn of document.querySelectorAll('[data-tab]')){
     const active=btn.dataset.tab===tab;btn.setAttribute('aria-current',String(active));el(btn.dataset.tab).hidden=!active;
   }
+  if(tab==='spp')await loadFinance();
   if(tab==='nilai')await loadGrades();
   if(tab==='krs')await loadKrs();
   if(tab==='jadwal')await loadSlots();
@@ -189,3 +190,38 @@ el('gradeForm').onsubmit=run(async()=>{
   await loadGrades();
   el('notice').textContent='Nilai tersimpan.';
 });
+
+
+const rupiah = value => 'Rp'+value.toLocaleString('id-ID');
+async function loadFinance() {
+  const d=await api('/api/spp/dashboard');
+  options(fields('payBill').bill,d.tagihan.filter(b=>b.sisa>0),'id',
+    b=>b.nama_lengkap+' | '+b.awal+' | '+rupiah(b.sisa)+' | '+b.status);
+  el('sppSummary').textContent='Penerimaan bulan ini '+rupiah(d.revenue)+'. Mahasiswa lunas '+d.collection_rate+'%. '+d.rekomendasi;
+  for(const id of ['balances','rates','chart','arrears'])el(id).replaceChildren();
+  for(const r of d.mahasiswa)item(el('balances'),r.nim+' | Tagihan '+rupiah(r.tagihan)+' | Dibayar '+rupiah(r.dibayar)+' | Sisa '+rupiah(r.sisa));
+  for(const r of d.prodi)item(el('rates'),r.nama+' | '+r.persen+'%');
+  for(const r of d.top)item(el('arrears'),r.nim+' | '+rupiah(r.tunggakan));
+  const max=Math.max(1,...d.bulan.map(r=>r.jumlah));
+  for(const r of d.bulan){
+    item(el('chart'),r.bulan+' | '+rupiah(r.jumlah)+' ');
+    const bar=document.createElement('meter');bar.max=max;bar.value=r.jumlah;
+    el('chart').lastElementChild.append(bar);
+  }
+}
+el('generateBill').onsubmit=run(async()=>{
+  const res=await api('/api/spp/tagihan?awal='+fields('generateBill').awal.value,'POST');
+  await loadFinance();el('notice').textContent=res.dibuat+' tagihan baru.';
+});
+let pendingPayment;
+el('payBill').onsubmit=run(async()=>{
+  const f=fields('payBill'), b=Number(f.bill.value), n=Number(f.amount.value);
+  if(!pendingPayment || pendingPayment.billing_id!==b || pendingPayment.amount!==n)
+    pendingPayment={transaction_id:crypto.randomUUID(),billing_id:b,amount:n};
+  await api('/api/spp/bayar','POST',pendingPayment);
+  pendingPayment=null;f.amount.value='';await loadFinance();el('notice').textContent='Pembayaran tercatat.';
+});
+setInterval(()=>{
+  if(key && !el('portal').hidden && !el('spp').hidden && !document.hidden)
+    run(loadFinance)();
+},30000);
