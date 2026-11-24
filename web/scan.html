@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Presensi mahasiswa</title><link rel="stylesheet" href="/aset/admin.css">
+<header><strong>Sevima Mini</strong><span>Presensi mahasiswa</span></header>
+<main><section><h1>Catat kehadiran</h1><form id="scan"><label>NIM<input name="nim" required maxlength="40" autocomplete="off"></label><button>Kirim presensi</button></form><p id="hasil" role="status"></p></section></main>
+<script>
+const token=location.hash.slice(1), form=document.querySelector('form'), hasil=document.getElementById('hasil');
+if(!token){form.hidden=true;hasil.textContent='Pindai QR yang ditampilkan dosen.';}
+form.onsubmit=async e=>{
+  e.preventDefault();form.querySelector('button').disabled=true;
+  try{
+    const r=await fetch('/attendance/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nim:form.elements.nim.value,token})});
+    const data=await r.json();hasil.textContent=r.ok?'Presensi tercatat: '+data.status+'.':data.detail;
+    if(r.ok)form.hidden=true;
+  }catch{hasil.textContent='Koneksi gagal. Coba lagi.';}
+  finally{form.querySelector('button').disabled=false;}
+};
+</script></html>

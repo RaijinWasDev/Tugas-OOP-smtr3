@@ -117,6 +117,7 @@ async function show(tab){
   for(const btn of document.querySelectorAll('[data-tab]')){
     const active=btn.dataset.tab===tab;btn.setAttribute('aria-current',String(active));el(btn.dataset.tab).hidden=!active;
   }
+  if(tab==='presensi'){options(fields('buatQR').kode,data.kuliah,'kode',c=>c.nama);await attendanceReport();}
   if(tab==='spp')await loadFinance();
   if(tab==='nilai')await loadGrades();
   if(tab==='krs')await loadKrs();
@@ -169,7 +170,7 @@ async function displayGrade() {
   el('history').replaceChildren();
   el('gpa').textContent='';
   form.hidden=!r || !r.dosen || r.presensi<75;
-  el('gradeInfo').textContent=r ? (r.dosen || 'Atur dosen di menu Jadwal')+' | Presensi demo '+r.presensi+'% | Nilai '+(r.nilai || 'belum diisi') : 'Setujui KRS terlebih dahulu.';
+  el('gradeInfo').textContent=r ? (r.dosen || 'Atur dosen di menu Jadwal')+' | Presensi '+Number(r.presensi.toFixed(2))+'% | Nilai '+(r.nilai || 'belum diisi') : 'Setujui KRS terlebih dahulu.';
   if(!r)return;
   form.elements.huruf.value=r.nilai || 'A';
   form.elements.alasan.required=Boolean(r.nilai);
@@ -225,3 +226,33 @@ setInterval(()=>{
   if(key && !el('portal').hidden && !el('spp').hidden && !document.hidden)
     run(loadFinance)();
 },30000);
+
+
+async function attendanceFile(path) {
+  const r=await fetch(path,{headers:{'X-Admin-Key':key},cache:'no-store'});
+  if(!r.ok)throw new Error((await r.json()).detail);
+  return r;
+}
+el('buatQR').onsubmit=run(async()=>{
+  const f=fields('buatQR');
+  el('qrBox').hidden=true;
+  const r=await attendanceFile('/attendance/qr/'+encodeURIComponent(f.kode.value)+'?'+new URLSearchParams({semester:f.semester.value,dosen:f.dosen.value}));
+  if(el('qrImg').src)URL.revokeObjectURL(el('qrImg').src);
+  el('qrImg').src=URL.createObjectURL(await r.blob());
+  el('scanLink').href=r.headers.get('X-Scan-Link');
+  el('qrBox').hidden=false;
+});
+async function attendanceReport(){
+  const r=await api('/attendance/report');
+  el('risk').textContent=r.rekap.length?r.jumlah_berisiko+' mahasiswa di bawah 75%.':'Rekap muncul setelah waktu presensi sesi pertama berakhir.';
+  el('attendanceRows').replaceChildren();
+  el('attendanceActions').replaceChildren();
+  for(const p of r.rekap)item(el('attendanceRows'),p.nim+' | '+p.kode+' | Semester '+p.semester+' | '+p.persen+'% | Hadir '+p.hadir+', terlambat '+p.terlambat+', absen '+p.absen+(p.risiko?' | Peringatan':''));
+  for(const action of r.actions)item(el('attendanceActions'),action);
+}
+el('attendanceRefresh').onclick=run(attendanceReport);
+el('attendanceExcel').onclick=run(async()=>{
+  const r=await attendanceFile('/attendance/report.xlsx'), link=document.createElement('a');
+  link.href=URL.createObjectURL(await r.blob());link.download='presensi.xlsx';link.click();
+  setTimeout(()=>URL.revokeObjectURL(link.href),1000);
+});

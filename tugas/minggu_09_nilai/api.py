@@ -7,17 +7,13 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from .gpa import hitung
+from tugas.minggu_12_presensi.laporan import PresensiAkademik
 
 router = APIRouter(prefix="/api/nilai", tags=["Nilai"])
 
 
 class PresensiPort(Protocol):
-    def persentase(self, nim: str, kode: str, semester: int) -> int: ...
-
-
-class PresensiDemo:
-    def persentase(self, nim, kode, semester):
-        return 70 if kode == "ST101" else 100
+    def persentase(self, nim: str, kode: str, semester: int) -> float: ...
 
 
 class InputNilai(BaseModel):
@@ -32,7 +28,7 @@ sumber = """FROM krs k JOIN krs_detail d ON k.id=d.krs_id
 
 
 @router.get("")
-def daftar(db: Session = Depends(get_db), presensi: PresensiPort = Depends(PresensiDemo)):
+def daftar(db: Session = Depends(get_db), presensi: PresensiPort = Depends(PresensiAkademik)):
     rows = db.execute(text("SELECT k.id,k.nim,k.semester,d.kode_mk,m.nama,d.nilai,j.dosen " + sumber +
                            " ORDER BY k.nim,k.semester,d.kode_mk")).mappings()
     return [dict(r, presensi=presensi.persentase(r.nim, r.kode_mk, r.semester)) for r in rows]
@@ -51,7 +47,7 @@ def ringkasan(nim: str, semester: int, db: Session = Depends(get_db)):
 
 @router.put("/{krs_id}/{kode}")
 def simpan(krs_id: int, kode: str, data: InputNilai, db: Session = Depends(get_db),
-           presensi: PresensiPort = Depends(PresensiDemo)):
+           presensi: PresensiPort = Depends(PresensiAkademik)):
     params = dict(id=krs_id, kode=kode, dosen=data.dosen.strip(), baru=data.huruf, alasan=data.alasan.strip())
     db.execute(text("BEGIN IMMEDIATE"))
     if not db.scalar(text("SELECT 1 FROM jadwal WHERE kode=:kode AND dosen=:dosen"), params):

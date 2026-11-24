@@ -8,3 +8,5 @@ pytest-cov
 httpx
 hypothesis
 APScheduler>=3.10,<4
+qrcode>=7.4,<9
+openpyxl>=3.1,<4

@@ -55,6 +55,10 @@ def test_input_dan_koreksi(tmp_path, monkeypatch):
         for kode in ["IF101","ST101"]:
             conn.exec_driver_sql("INSERT INTO krs_detail(krs_id,kode_mk) VALUES(1,?)",(kode,))
             conn.exec_driver_sql("INSERT INTO jadwal VALUES(?,'A101','Dosen Demo')",(kode,))
+        for i,kode in enumerate(["IF101","ST101"],1):
+            conn.exec_driver_sql("INSERT INTO sesi_presensi VALUES(?,?,1,?,0,1,?,1)",(i,kode,"2020-01-01","lama"+kode))
+            status="hadir" if kode=="IF101" else None
+            conn.exec_driver_sql("INSERT INTO peserta_presensi VALUES(?,?,?,?)",(i,nim,0 if status else None,status))
     def sesi():
         with Session(engine) as db:
             yield db

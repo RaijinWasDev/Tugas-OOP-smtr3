@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 
 from tugas.minggu_09_nilai import api as nilai
 from tugas.minggu_11_keuangan import api as spp
+from tugas.minggu_12_presensi import api as presensi
 from routers import admin
 from routers.akses import require_admin
 from tugas.minggu_03_pendaftaran_pmb import api as pendaftaran
@@ -16,6 +17,7 @@ from tugas.minggu_05_pengisian_krs.pengisian import KRSError
 
 app = FastAPI(lifespan=spp.lifespan, title="Sevima Mini", description="Administrasi PMB, KRS, dan jadwal kuliah")
 akses_admin = [Depends(require_admin)]
+app.include_router(presensi.router)
 app.include_router(admin.router)
 app.include_router(spp.router, dependencies=akses_admin)
 app.include_router(spp.gateway)
@@ -40,4 +42,3 @@ async def invalid_input(request, exc):
 @app.exception_handler(KRSError)
 async def invalid_krs(request, exc):
     return JSONResponse(status_code=exc.status, content={"detail": str(exc)})
-
