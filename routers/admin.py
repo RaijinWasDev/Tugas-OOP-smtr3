@@ -22,7 +22,13 @@ def data_admin(db=Depends(get_db)):
         "pendaftar": "SELECT id, nama_lengkap, nim, status FROM calon_mahasiswa ORDER BY id DESC",
         "prodi": "SELECT id, nama FROM program_studi ORDER BY id",
         "jalur": "SELECT id, nama FROM jalur_masuk ORDER BY id",
-        "kuliah": "SELECT kode, nama FROM matakuliah ORDER BY nama",
+        "kuliah": "SELECT kode, nama, sks FROM matakuliah ORDER BY nama",
         "ruang": "SELECT kode, kapasitas FROM ruangan ORDER BY kode",
     }
     return {name: db.execute(text(query)).mappings().all() for name, query in queries.items()}
+
+
+
+@router.get("/laporan-uml", include_in_schema=False)
+def laporan_uml():
+    return FileResponse(WEB.parent / "tugas/minggu_02_uml/Final-UML.pdf", media_type="application/pdf")

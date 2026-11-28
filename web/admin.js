@@ -120,12 +120,13 @@ async function show(tab){
   if(tab==='presensi'){options(fields('buatQR').kode,data.kuliah,'kode',c=>c.nama);await attendanceReport();}
   if(tab==='spp')await loadFinance();
   if(tab==='nilai')await loadGrades();
+  if(tab==='home'){await loadPeople();renderHome();}
   if(tab==='krs')await loadKrs();
   if(tab==='jadwal')await loadSlots();
 }
 el('signin').onsubmit=run(async()=>{
   key=fields('signin').key.value.trim();await loadPeople();el('signin').reset();
-  el('login').hidden=true;el('logout').hidden=false;el('portal').hidden=false;await show('pmb');
+  el('login').hidden=true;el('logout').hidden=false;el('portal').hidden=false;await show('home');
 });
 el('logout').onclick=()=>location.reload();
 for(const b of document.querySelectorAll('[data-tab]'))b.onclick=run(()=>show(b.dataset.tab));
@@ -256,3 +257,19 @@ el('attendanceExcel').onclick=run(async()=>{
   link.href=URL.createObjectURL(await r.blob());link.download='presensi.xlsx';link.click();
   setTimeout(()=>URL.revokeObjectURL(link.href),1000);
 });
+
+
+function renderHome(){
+  el('pendingCount').textContent=data.pendaftar.filter(p=>p.status==='pending').length;
+  el('activeCount').textContent=data.pendaftar.filter(p=>p.nim).length;
+  el('courseCount').textContent=data.kuliah.length;
+  const list=el('catalog');list.replaceChildren();
+  for(const c of data.kuliah){
+    const group=c.kode.startsWith('SI')?'Sistem Informasi':c.kode.startsWith('TI')||c.kode==='IF201'?'Teknik Informatika':'Dasar bersama';
+    if(el('catalogGroup').value==='Semua'||el('catalogGroup').value===group)
+      item(list,c.kode+'  ·  '+c.nama+'  ·  '+c.sks+' SKS');
+  }
+  if(!list.children.length)item(list,'Belum ada mata kuliah dalam kelompok ini.');
+}
+el('catalogGroup').onchange=renderHome;
+for(const button of document.querySelectorAll('[data-open]'))button.onclick=run(()=>show(button.dataset.open));

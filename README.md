@@ -1,21 +1,25 @@
-# Sevima Mini
+# Sevima Mini — Dashboard presentasi
+
+Untuk presentasi di Windows, gunakan Python 3.11, instal dependensi dengan 'python -m pip install -r requirements.txt', lalu buka **Buka-Presentasi.cmd**. Buka http://127.0.0.1:8007/admin dan salin kunci dari terminal. Branch ini memakai database latihan terpisah saat launcher presentasi dipilih. Data latihan tersimpan antar-sesi.
+
+**Urutan praktik:** setujui Rina Larasati di Pendaftaran, pilih Nadia Putri semester 1 di KRS, tambahkan Pemodelan Proses Bisnis (total 6 SKS), ajukan lalu setujui. Di Ringkasan buka Diagram UML untuk menjelaskan alur yang baru didemokan. Budi Pratama memiliki KRS disetujui, pembayaran lunas dan presensi untuk demo Nilai (dosen Ratna Sari).
 
 ## Menjalankan portal admin di Windows
 
-Gunakan Python 3.11. Untuk demo minggu 12, ambil branch `tugas/minggu-12`. Pada instalasi pertama, jalankan di PowerShell:
+Gunakan Python 3.11. Untuk dashboard presentasi, ambil branch `presentasi/dashboard`. Pada instalasi pertama, jalankan di PowerShell:
 
 ~~~powershell
-git clone --branch tugas/minggu-12 https://github.com/RaijinWasDev/Tugas-OOP-smtr3.git
+git clone --branch presentasi/dashboard https://github.com/RaijinWasDev/Tugas-OOP-smtr3.git
 cd Tugas-OOP-smtr3
 python -m pip install -r requirements.txt
-.\Buka-Sevima.cmd
+.\Buka-Presentasi.cmd
 ~~~
 
-Jika sudah mengunduh dan mengekstrak ZIP dari GitHub, buka terminal di folder yang berisi `main.py`, lalu jalankan dua perintah terakhir. Untuk pemakaian berikutnya cukup buka `Buka-Sevima.cmd` di folder tersebut.
+Jika sudah mengunduh dan mengekstrak ZIP dari GitHub, buka terminal di folder yang berisi `main.py`, lalu jalankan dua perintah terakhir. Untuk pemakaian berikutnya cukup buka `Buka-Presentasi.cmd` di folder tersebut.
 
 Setelah terminal menampilkan **Uvicorn running**, buka http://127.0.0.1:8007/admin di laptop yang menjalankan program. Gunakan kunci admin dari terminal itu. Launcher menyiapkan database lokal saat pertama dijalankan. Untuk demo dengan database baru, mulai dari menu Pendaftaran.
 
-Tekan Ctrl+C di terminal untuk menghentikan server. Jika port 8007 sedang dipakai, hentikan server lama atau jalankan `.\Buka-Sevima.cmd 8008` dan buka alamat yang tercetak. Kedua port menjalankan aplikasi dan database dari folder proyek yang sama.
+Tekan Ctrl+C di terminal untuk menghentikan server. Jika port 8007 sedang dipakai, hentikan server lama atau jalankan `.\Buka-Presentasi.cmd 8008` dan buka alamat yang tercetak. Kedua port menjalankan aplikasi dan database dari folder proyek yang sama.
 
 ## Tugas mingguan
 
@@ -36,3 +40,5 @@ Tekan Ctrl+C di terminal untuk menghentikan server. Jika port 8007 sedang dipaka
 - [Minggu 11 — Keuangan SPP](tugas/minggu_11_keuangan/)
 
 - [Minggu 12 — Presensi QR](tugas/minggu_12_presensi/)
+
+

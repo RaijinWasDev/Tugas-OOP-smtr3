@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from sqlalchemy import create_engine, event
@@ -5,7 +6,7 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 
 # Menentukan lokasi file database.
-DB_PATH = Path(__file__).resolve().parent / "akademik.db"
+DB_PATH = Path(__file__).resolve().parent / ("presentasi.db" if os.getenv("SEVIMA_PRESENTASI") == "1" else "akademik.db")
 
 # Mengatur koneksi ke database SQLite.
 engine = create_engine(
