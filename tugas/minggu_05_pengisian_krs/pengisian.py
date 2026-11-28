@@ -21,6 +21,8 @@ class KRSManager:
         try:
             return self.db.execute(text(sql),args)
         except IntegrityError as exc:
+            if str(exc.orig) in ("Mata kuliah di luar prodi","Batas semester awal 20 SKS","Semester 1 dan 2 wajib 20 SKS"):
+                raise KRSError(str(exc.orig), 409) from exc
             if str(exc.orig) == "SPP tertunggak":
                 raise KRSError("Lunasi tunggakan SPP sebelum mengisi atau mengajukan KRS.", 409) from exc
             raise
@@ -103,5 +105,6 @@ class KRSManager:
                 if not result.passed and result.message not in errors:
                     errors.append(result.message)
         return {**self.summary(k.id,k.status),"valid":not errors,"kesalahan":errors}
+
 
 

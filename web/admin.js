@@ -58,11 +58,15 @@ async function loadKrs(){
   for(const id of ['add','submitKrs','review','reopen'])el(id).hidden=true;
   if(!el('student').value){el('summary').textContent='Setujui pendaftar di menu Pendaftaran untuk membuat KRS.';return;}
   if(!el('semester').validity.valid || !el('semester').value){el('summary').textContent='Pilih semester mulai dari 1.';return;}
+  const sem=Number(el('semester').value), prodi=data.pendaftar.find(p=>p.nim===el('student').value)?.program_studi_id;
+  const pilihan=data.kuliah.filter(c=>c.prodi_id===prodi && (sem>2 || c.semester===sem)).sort((a,b)=>Number(b.semester===sem)-Number(a.semester===sem));
+  options(fields('add').course,pilihan,'kode',c=>c.nama+' · '+c.sks+' SKS (semester '+c.semester+')');
   let record;
   try{record=await api(krsPath()+'/validasi');}catch(e){if(e.status!==404)throw e;}
   if(request!==generation)return;
   current=record;
   el('summary').textContent=record?[statusText[record.status],record.total_sks+' SKS',record.catatan].filter(Boolean).join(' \u00b7 '):'Belum ada mata kuliah yang dipilih.';
+  el('summary').textContent+=' | '+(sem<=2?'Wajib 20 SKS':'Maksimal 24 SKS')+' | Lulus '+(data.pendaftar.find(p=>p.nim===el('student').value)?.sks_lulus || 0)+'/144 SKS';
   const editable=!record || ['draft','revision','approved'].includes(record.status);
   for(const code of record?.mata_kuliah || [])item(el('courses'),courseName(code),'Hapus',editable?async()=>{await editCourse(code,'DELETE');}:null);
   el('add').hidden=!editable;el('submitKrs').hidden=!editable || record?.status==='approved' || !record?.mata_kuliah.length;
@@ -265,11 +269,13 @@ function renderHome(){
   el('courseCount').textContent=data.kuliah.length;
   const list=el('catalog');list.replaceChildren();
   for(const c of data.kuliah){
-    const group=c.kode.startsWith('SI')?'Sistem Informasi':c.kode.startsWith('TI')||c.kode==='IF201'?'Teknik Informatika':'Dasar bersama';
+    const group=c.kelompok;
     if(el('catalogGroup').value==='Semua'||el('catalogGroup').value===group)
-      item(list,c.kode+'  ·  '+c.nama+'  ·  '+c.sks+' SKS');
+      item(list,'Sem. '+c.semester+' · '+c.nama+'  ·  '+c.sks+' SKS');
   }
   if(!list.children.length)item(list,'Belum ada mata kuliah dalam kelompok ini.');
 }
 el('catalogGroup').onchange=renderHome;
 for(const button of document.querySelectorAll('[data-open]'))button.onclick=run(()=>show(button.dataset.open));
+
+

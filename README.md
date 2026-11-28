@@ -38,3 +38,9 @@ Tekan Ctrl+C di terminal untuk menghentikan server. Jika port 8007 sedang dipaka
 - [Minggu 12 — Presensi QR](tugas/minggu_12_presensi/)
 
 
+
+## Kurikulum TI dan SI
+
+Setiap prodi memiliki 42 mata kuliah (144 SKS). Rekomendasi per semester: 20, 20, 21, 21, 21, 21, 14, 6 SKS. Semester 1 dan 2 memerlukan 20 SKS untuk diajukan. Mulai semester 3 batas pengisian adalah 24 SKS. Progres lulus menjumlahkan mata kuliah berbeda dalam kurikulum yang memiliki nilai lulus pada KRS disetujui. Nama dosen, ruangan, jadwal, kode, bobot dan pembagian semester disusun untuk aplikasi. Topik mengacu pada program Sarjana Ilmu Komputer dan Sistem Informasi Fasilkom UI:
+https://cs.ui.ac.id/sarjana-ilmu-komputer/
+https://cs.ui.ac.id/sarjana-sistem-informasi/
